@@ -21,6 +21,13 @@ make lab-down                        # delete the cluster
 - `monitoring-values.yaml` - slim kube-prometheus-stack (Prometheus, Alertmanager, Grafana;
   Grafana admin password is `admin`, lab only)
 
+## Read-only agent identity
+`make agent-kubeconfig` applies `rbac/readonly.yaml` (ServiceAccount `sre-agent/sre-agent-readonly`
+with a get/list/watch-only ClusterRole) and writes `.kube/agent.kubeconfig` with a short-lived
+token (8h by default; `DURATION=2h make agent-kubeconfig` to change). The agent must only ever be
+given this file. ConfigMaps are readable by RBAC (several incidents are config bugs) so the tools
+layer returns their key names only, never values.
+
 ## NetworkPolicy scenario
 `networkpolicy-block` only reproduces if the cluster CNI enforces NetworkPolicy. If traffic is
 not blocked on your kind version, recreate the cluster with the default CNI disabled
