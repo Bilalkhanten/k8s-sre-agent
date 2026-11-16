@@ -1,0 +1,13 @@
+{
+  "status": "firing",
+  "labels": {
+    "alertname": "KubeDeploymentRolloutStuck",
+    "namespace": "demo",
+    "severity": "warning",
+    "deployment": "checkout-api"
+  },
+  "annotations": {
+    "summary": "Rollout of deployment checkout-api in namespace demo has made no progress.",
+    "description": "The new revision has unavailable replicas and the rollout has not completed."
+  }
+}

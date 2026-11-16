@@ -1,0 +1,14 @@
+# Slimmed-down kube-prometheus-stack values for a laptop-sized kind cluster. Lab use only.
+grafana:
+  enabled: true
+  adminPassword: admin # lab only - never reuse
+alertmanager:
+  enabled: true
+prometheus:
+  prometheusSpec:
+    retention: 6h
+    serviceMonitorSelectorNilUsesHelmValues: false
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi

@@ -1,0 +1,50 @@
+# The "bad deploy": a new revision that reads a ConfigMap key which does not exist.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-api
+  namespace: demo
+  labels:
+    app: checkout-api
+    sre-agent.dev/scenario: bad-config-rollout
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: checkout-api
+  template:
+    metadata:
+      labels:
+        app: checkout-api
+        sre-agent.dev/scenario: bad-config-rollout
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/stefanprodan/podinfo:6.7.1
+          ports:
+            - containerPort: 9898
+          env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LOG_LEVEL
+            - name: PAYMENTS_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  # Key was never added to app-config -> CreateContainerConfigError.
+                  key: payments-endpoint
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9898
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi

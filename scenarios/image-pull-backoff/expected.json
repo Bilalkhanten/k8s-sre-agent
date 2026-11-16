@@ -1,0 +1,20 @@
+{
+  "id": "image-pull-backoff",
+  "title": "Deployment references an image tag that does not exist",
+  "difficulty": "easy",
+  "root_cause": {
+    "category": "image",
+    "summary": "The image tag ghcr.io/stefanprodan/podinfo:99.99.99 does not exist, so the kubelet cannot pull it (ErrImagePull / ImagePullBackOff).",
+    "resource": { "kind": "Deployment", "name": "bad-image", "namespace": "demo" }
+  },
+  "required_evidence": [
+    "Container waiting reason is ErrImagePull or ImagePullBackOff",
+    "Pod events report that the image tag was not found / manifest unknown",
+    "Image tag is 99.99.99"
+  ],
+  "red_herrings": [
+    "The registry is public; this is not an authentication or imagePullSecret problem",
+    "Other podinfo pods in the namespace pull the same image repository successfully"
+  ],
+  "fix": "Correct the image tag to one that exists (for example 6.7.1) and roll out again."
+}

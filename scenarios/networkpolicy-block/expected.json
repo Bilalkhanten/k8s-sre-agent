@@ -1,0 +1,21 @@
+{
+  "id": "networkpolicy-block",
+  "title": "NetworkPolicy silently drops traffic from the calling service",
+  "difficulty": "hard",
+  "root_cause": {
+    "category": "network",
+    "summary": "NetworkPolicy restrict-inventory-ingress only allows ingress from pods labelled app=billing, so traffic from storefront (app=storefront) to inventory is dropped and times out.",
+    "resource": { "kind": "NetworkPolicy", "name": "restrict-inventory-ingress", "namespace": "demo" }
+  },
+  "required_evidence": [
+    "NetworkPolicy restrict-inventory-ingress selects app=inventory and allows ingress only from app=billing",
+    "storefront pods are labelled app=storefront, which is not in the allowed list",
+    "storefront logs show timeouts (not connection refused or DNS errors)"
+  ],
+  "red_herrings": [
+    "inventory pods are Running and Ready, and the Service has endpoints",
+    "DNS resolves inventory.demo.svc.cluster.local correctly",
+    "A timeout rather than 'connection refused' points to dropped packets, not a dead server"
+  ],
+  "fix": "Add a rule to the NetworkPolicy that allows ingress from app=storefront (or remove the policy if it was applied by mistake)."
+}

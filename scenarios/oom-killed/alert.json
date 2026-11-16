@@ -1,0 +1,13 @@
+{
+  "status": "firing",
+  "labels": {
+    "alertname": "KubePodCrashLooping",
+    "namespace": "demo",
+    "severity": "warning",
+    "deployment": "memory-hog"
+  },
+  "annotations": {
+    "summary": "Pods of deployment memory-hog in namespace demo are crash looping.",
+    "description": "Container worker in a memory-hog pod has restarted repeatedly in the last 15 minutes."
+  }
+}

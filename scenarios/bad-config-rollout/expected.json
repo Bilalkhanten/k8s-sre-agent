@@ -1,0 +1,22 @@
+{
+  "id": "bad-config-rollout",
+  "title": "New revision references a ConfigMap key that does not exist",
+  "difficulty": "hard",
+  "root_cause": {
+    "category": "configuration",
+    "summary": "The latest checkout-api revision reads PAYMENTS_ENDPOINT from key payments-endpoint in ConfigMap app-config, which has no such key, so new pods fail with CreateContainerConfigError and the rollout stalls.",
+    "resource": { "kind": "Deployment", "name": "checkout-api", "namespace": "demo" }
+  },
+  "required_evidence": [
+    "New pods are in CreateContainerConfigError",
+    "Pod events say the key payments-endpoint was not found in ConfigMap app-config",
+    "ConfigMap app-config only contains LOG_LEVEL",
+    "Deployment rollout history shows a new revision that is not progressing"
+  ],
+  "red_herrings": [
+    "Old pods from the previous revision are still Ready, so the service is up and partially degraded",
+    "The container image is fine; this is not an image or probe problem",
+    "No resource pressure"
+  ],
+  "fix": "Add the payments-endpoint key to app-config (or remove the reference), or roll back to the previous revision with kubectl rollout undo."
+}

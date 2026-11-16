@@ -1,0 +1,22 @@
+{
+  "id": "failing-readiness-probe",
+  "title": "Readiness probe points at a path that returns 404",
+  "difficulty": "medium",
+  "root_cause": {
+    "category": "probe",
+    "summary": "The readiness probe requests /ready-wrong, which returns 404, so pods are Running but never Ready and the Service has no endpoints.",
+    "resource": { "kind": "Deployment", "name": "catalog", "namespace": "demo" }
+  },
+  "required_evidence": [
+    "Pods are Running with zero restarts but not Ready",
+    "Events show Readiness probe failed with HTTP status 404",
+    "Readiness probe path is /ready-wrong",
+    "Service catalog has no ready endpoints"
+  ],
+  "red_herrings": [
+    "Container logs look healthy; the application itself is fine",
+    "The liveness probe passes, so the container is not restarting",
+    "No resource pressure or scheduling problems"
+  ],
+  "fix": "Change the readiness probe path to a valid endpoint such as /readyz."
+}

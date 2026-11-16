@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-quota
+  labels:
+    sre-agent.dev/scenario: quota-exceeded
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+  namespace: demo-quota
+  labels:
+    sre-agent.dev/scenario: quota-exceeded
+spec:
+  hard:
+    pods: "2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: batch-workers
+  namespace: demo-quota
+  labels:
+    app: batch-workers
+    sre-agent.dev/scenario: quota-exceeded
+spec:
+  # Asks for 5 pods while the namespace quota allows 2.
+  replicas: 5
+  selector:
+    matchLabels:
+      app: batch-workers
+  template:
+    metadata:
+      labels:
+        app: batch-workers
+        sre-agent.dev/scenario: quota-exceeded
+    spec:
+      containers:
+        - name: worker
+          image: registry.k8s.io/pause:3.9

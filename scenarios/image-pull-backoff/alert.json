@@ -1,0 +1,13 @@
+{
+  "status": "firing",
+  "labels": {
+    "alertname": "KubePodNotReady",
+    "namespace": "demo",
+    "severity": "warning",
+    "deployment": "bad-image"
+  },
+  "annotations": {
+    "summary": "Pod of deployment bad-image in namespace demo has not been ready for 10 minutes.",
+    "description": "The pod is stuck in Pending/Waiting and never became ready."
+  }
+}

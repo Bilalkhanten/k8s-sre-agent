@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-image
+  namespace: demo
+  labels:
+    app: bad-image
+    sre-agent.dev/scenario: image-pull-backoff
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bad-image
+  template:
+    metadata:
+      labels:
+        app: bad-image
+        sre-agent.dev/scenario: image-pull-backoff
+    spec:
+      containers:
+        - name: app
+          # This tag does not exist in the registry.
+          image: ghcr.io/stefanprodan/podinfo:99.99.99
+          ports:
+            - containerPort: 9898
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi

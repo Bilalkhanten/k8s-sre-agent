@@ -1,0 +1,20 @@
+{
+  "id": "quota-exceeded",
+  "title": "ReplicaSet cannot create pods because the namespace quota is full",
+  "difficulty": "medium",
+  "root_cause": {
+    "category": "quota",
+    "summary": "ResourceQuota team-quota limits the namespace to 2 pods, but the deployment asks for 5, so the ReplicaSet gets FailedCreate (exceeded quota) for the rest.",
+    "resource": { "kind": "ResourceQuota", "name": "team-quota", "namespace": "demo-quota" }
+  },
+  "required_evidence": [
+    "ReplicaSet events show FailedCreate with 'exceeded quota: team-quota'",
+    "ResourceQuota team-quota has pods hard limit 2 with 2 used",
+    "Deployment desires 5 replicas but only 2 pods exist"
+  ],
+  "red_herrings": [
+    "There are no Pending pods; the missing pods were never created, so the scheduler is not involved",
+    "Cluster nodes have spare capacity"
+  ],
+  "fix": "Raise the pods quota, or reduce the deployment replica count to fit within it."
+}

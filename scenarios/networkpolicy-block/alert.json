@@ -1,0 +1,13 @@
+{
+  "status": "firing",
+  "labels": {
+    "alertname": "StorefrontUpstreamErrors",
+    "namespace": "demo",
+    "severity": "critical",
+    "deployment": "storefront"
+  },
+  "annotations": {
+    "summary": "Storefront in namespace demo cannot reach the inventory service.",
+    "description": "Requests from storefront to inventory are timing out. The inventory deployment reports healthy."
+  }
+}

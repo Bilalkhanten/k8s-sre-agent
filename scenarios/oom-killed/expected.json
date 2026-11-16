@@ -1,0 +1,20 @@
+{
+  "id": "oom-killed",
+  "title": "Container killed for exceeding its memory limit",
+  "difficulty": "easy",
+  "root_cause": {
+    "category": "resource-limits",
+    "summary": "The worker container allocates more memory (~200M) than its 64Mi limit and is OOMKilled, which surfaces as CrashLoopBackOff.",
+    "resource": { "kind": "Deployment", "name": "memory-hog", "namespace": "demo" }
+  },
+  "required_evidence": [
+    "Last terminated state reason is OOMKilled (exit code 137)",
+    "Container memory limit is 64Mi",
+    "Container arguments request 200M of memory"
+  ],
+  "red_herrings": [
+    "CrashLoopBackOff is a symptom, not the cause",
+    "The node has plenty of free memory; this is a cgroup limit, not node pressure"
+  ],
+  "fix": "Raise the container memory limit above the real working set, or reduce what the workload allocates."
+}

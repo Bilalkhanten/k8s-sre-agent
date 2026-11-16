@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-hog
+  namespace: demo
+  labels:
+    app: memory-hog
+    sre-agent.dev/scenario: oom-killed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memory-hog
+  template:
+    metadata:
+      labels:
+        app: memory-hog
+        sre-agent.dev/scenario: oom-killed
+    spec:
+      containers:
+        - name: worker
+          image: polinux/stress
+          command: ["stress"]
+          # Tries to hold 200M while the container limit is 64Mi -> OOMKilled.
+          args: ["--vm", "1", "--vm-bytes", "200M", "--vm-hang", "1"]
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              memory: 64Mi

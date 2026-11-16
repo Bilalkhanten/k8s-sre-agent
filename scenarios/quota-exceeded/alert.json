@@ -1,0 +1,13 @@
+{
+  "status": "firing",
+  "labels": {
+    "alertname": "KubeDeploymentReplicasMismatch",
+    "namespace": "demo-quota",
+    "severity": "warning",
+    "deployment": "batch-workers"
+  },
+  "annotations": {
+    "summary": "Deployment batch-workers in namespace demo-quota has 2 of 5 replicas available.",
+    "description": "The deployment has not matched its desired replica count for 15 minutes."
+  }
+}

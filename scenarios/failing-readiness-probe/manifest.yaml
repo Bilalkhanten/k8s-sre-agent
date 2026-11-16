@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: demo
+  labels:
+    app: catalog
+    sre-agent.dev/scenario: failing-readiness-probe
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+        sre-agent.dev/scenario: failing-readiness-probe
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/stefanprodan/podinfo:6.7.1
+          ports:
+            - containerPort: 9898
+          readinessProbe:
+            httpGet:
+              # Wrong path: the app returns 404, so the pod never becomes Ready.
+              path: /ready-wrong
+              port: 9898
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9898
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: demo
+  labels:
+    sre-agent.dev/scenario: failing-readiness-probe
+spec:
+  selector:
+    app: catalog
+  ports:
+    - port: 80
+      targetPort: 9898

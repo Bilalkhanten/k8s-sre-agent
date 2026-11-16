@@ -1,0 +1,13 @@
+{
+  "status": "firing",
+  "labels": {
+    "alertname": "KubeDeploymentReplicasMismatch",
+    "namespace": "demo",
+    "severity": "warning",
+    "deployment": "catalog"
+  },
+  "annotations": {
+    "summary": "Deployment catalog in namespace demo has 0 of 2 replicas available.",
+    "description": "Service catalog has no ready endpoints and requests to it fail."
+  }
+}

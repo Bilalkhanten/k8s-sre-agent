@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
+      - run: uv run k8s-sre-agent scenarios validate
+
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install kubeconform
+        run: |
+          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
+            | tar -xz kubeconform
+      - name: Validate Kubernetes manifests
+        run: |
+          find lab/demo-app scenarios -name '*.yaml' -print0 \
+            | xargs -0 ./kubeconform -strict -summary -kubernetes-version 1.30.0
+      - name: Shellcheck
+        run: shellcheck scripts/*.sh

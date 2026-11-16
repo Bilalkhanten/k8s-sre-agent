@@ -1,0 +1,54 @@
+# Healthy "before" state: applied first by scripts/scenario.sh and waited on.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: demo
+  labels:
+    sre-agent.dev/scenario: bad-config-rollout
+data:
+  LOG_LEVEL: info
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-api
+  namespace: demo
+  labels:
+    app: checkout-api
+    sre-agent.dev/scenario: bad-config-rollout
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: checkout-api
+  template:
+    metadata:
+      labels:
+        app: checkout-api
+        sre-agent.dev/scenario: bad-config-rollout
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/stefanprodan/podinfo:6.7.1
+          ports:
+            - containerPort: 9898
+          env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LOG_LEVEL
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9898
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
