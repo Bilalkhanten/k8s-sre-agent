@@ -1,0 +1,59 @@
+# Read-only identity for the agent. Enforced by Kubernetes RBAC, not by prompts.
+#
+# Rules of thumb (also asserted in tests/test_rbac.py):
+#   * verbs are limited to get / list / watch - never create, update, patch, delete, exec
+#   * no `secrets` (and no wildcards), so a compromised or confused agent cannot read them
+#   * configmaps are readable because several incidents are caused by them; the tools layer
+#     returns key names only, never values (RBAC cannot filter fields)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sre-agent
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sre-agent-readonly
+  namespace: sre-agent
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sre-agent-readonly
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - pods/log
+      - events
+      - namespaces
+      - nodes
+      - services
+      - endpoints
+      - configmaps
+      - resourcequotas
+      - limitranges
+      - persistentvolumeclaims
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies", "ingresses"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sre-agent-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sre-agent-readonly
+subjects:
+  - kind: ServiceAccount
+    name: sre-agent-readonly
+    namespace: sre-agent
