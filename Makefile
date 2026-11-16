@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 S ?=
 
-.PHONY: help install lint fmt test check lab-up lab-down scenarios-list scenario-up scenario-down
+.PHONY: help install lint fmt test check lab-up lab-down agent-kubeconfig lab-test scenarios-list scenario-up scenario-down
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
@@ -28,6 +28,12 @@ lab-up: ## Create the kind cluster, demo app and monitoring stack
 
 lab-down: ## Destroy the kind cluster
 	./scripts/lab.sh down
+
+agent-kubeconfig: ## Apply read-only RBAC and write .kube/agent.kubeconfig
+	./scripts/agent-kubeconfig.sh
+
+lab-test: ## Run lab integration tests (needs a running lab + agent kubeconfig)
+	K8S_SRE_AGENT_LAB=1 uv run pytest -m lab
 
 scenarios-list: ## List failure scenarios
 	uv run k8s-sre-agent scenarios list
