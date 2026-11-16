@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Muhammad Bilal Khan" }]
 dependencies = [
+    "httpx>=0.28.1",
     "pydantic>=2.7",
     "pyyaml>=6.0",
 ]
